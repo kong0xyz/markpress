@@ -1,0 +1,10 @@
+{
+  "id": "markpress",
+  "name": "MarkPress",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Convert Markdown notes into WeChat public account ready rich text with live preview and theme engine.",
+  "author": "MarkPress",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}

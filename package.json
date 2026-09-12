@@ -1,0 +1,31 @@
+{
+  "name": "markpress",
+  "version": "0.1.0",
+  "description": "Obsidian plugin for WeChat public account Markdown formatting",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "typecheck": "tsc -noEmit -skipLibCheck"
+  },
+  "keywords": [
+    "obsidian",
+    "wechat",
+    "markdown"
+  ],
+  "author": "MarkPress",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.20.0",
+    "obsidian": "latest",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^14.0.0",
+    "markdown-it-mark": "^4.0.0"
+  }
+}

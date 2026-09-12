@@ -1,0 +1,175 @@
+.markpress-preview-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--background-primary);
+}
+
+.markpress-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-wrap: wrap;
+  background: var(--background-secondary);
+}
+
+.markpress-theme-select,
+.markpress-color-mode {
+  font-size: 13px;
+  min-width: 88px;
+  max-width: 160px;
+}
+
+.markpress-shadow-host {
+  display: block;
+  width: 100%;
+}
+
+.markpress-toolbar button {
+  font-size: 13px;
+}
+
+.markpress-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.markpress-icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.markpress-toolbar .spacer {
+  flex: 1;
+}
+
+.markpress-preview-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 24px 16px 48px;
+  /* Fixed canvas — independent of Obsidian theme */
+  background: #e8eaed;
+}
+
+.markpress-preview-frame {
+  max-width: 680px;
+  margin: 0 auto;
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  padding: 16px 20px 24px;
+  min-height: 320px;
+}
+
+.markpress-preview-frame.is-dark {
+  background: #09090b;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.markpress-preview-frame.is-dark .markpress-preview-meta {
+  color: #71717a;
+}
+
+.markpress-preview-frame.is-dark .markpress-empty {
+  color: #a1a1aa;
+}
+
+.markpress-preview-meta {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #8b8b8b;
+  margin: 0 0 12px;
+  letter-spacing: 0.02em;
+  word-break: break-all;
+}
+
+.markpress-preview-body {
+  /* Isolate from Obsidian theme styles (bold/quote accents, etc.) */
+  color: #09090b;
+}
+
+.markpress-preview-body strong,
+.markpress-preview-body b,
+.markpress-preview-body em,
+.markpress-preview-body i,
+.markpress-preview-body s,
+.markpress-preview-body del,
+.markpress-preview-body blockquote,
+.markpress-preview-body a,
+.markpress-preview-body code,
+.markpress-preview-body p,
+.markpress-preview-body li,
+.markpress-preview-body h1,
+.markpress-preview-body h2,
+.markpress-preview-body h3,
+.markpress-preview-body h4,
+.markpress-preview-body h5,
+.markpress-preview-body h6,
+.markpress-preview-body td,
+.markpress-preview-body th {
+  /* Prefer MarkPress inline styles; neutralize Obsidian accent paints */
+  background-image: none !important;
+}
+
+.markpress-preview-body mark {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* Obsidian themes often paint pre/code with low-contrast tokens — kill that. */
+.markpress-preview-body pre,
+.markpress-preview-body pre code,
+.markpress-preview-body :not(pre) > code {
+  -webkit-text-fill-color: unset !important;
+  text-shadow: none !important;
+}
+
+.markpress-status {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+.markpress-status.is-hidden {
+  display: none;
+}
+
+.markpress-status.is-error {
+  color: var(--text-error);
+}
+
+.markpress-empty {
+  color: #888;
+  text-align: center;
+  padding: 48px 16px;
+  font-size: 14px;
+}
+
+.markpress-status-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 0 6px;
+}
+
+.markpress-status-bar:hover {
+  color: var(--text-accent);
+}
+
+.markpress-status-bar svg {
+  width: 14px;
+  height: 14px;
+}
+
+.markpress-status-bar-label {
+  font-size: 12px;
+}
