@@ -16,10 +16,21 @@
 }
 
 .markpress-theme-select,
-.markpress-color-mode {
+.markpress-color-mode,
+.markpress-platform-select {
   font-size: 13px;
   min-width: 88px;
   max-width: 160px;
+}
+
+.markpress-wechat-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.markpress-wechat-controls.is-hidden {
+  display: none;
 }
 
 .markpress-shadow-host {

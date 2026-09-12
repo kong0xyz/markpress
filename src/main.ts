@@ -19,16 +19,15 @@ export default class MarkPressPlugin extends Plugin {
       (leaf) => new MarkPressPreviewView(leaf, this)
     );
 
-    // Left ribbon
-    this.addRibbonIcon("book-open", "MarkPress: WeChat Preview", () => {
+    this.addRibbonIcon("book-open", "MarkPress Preview", () => {
       void this.activatePreviewView(true);
     });
 
     // Status bar — always visible quick open
     const status = this.addStatusBarItem();
     status.addClass("markpress-status-bar");
-    status.setAttr("aria-label", "MarkPress WeChat Preview");
-    status.setAttr("title", "MarkPress WeChat Preview (⌘⇧M)");
+    status.setAttr("aria-label", "MarkPress Preview");
+    status.setAttr("title", "MarkPress Preview (⌘⇧M)");
     setIcon(status, "book-open");
     status.createSpan({ text: " MarkPress", cls: "markpress-status-bar-label" });
     status.addEventListener("click", () => {
@@ -37,7 +36,7 @@ export default class MarkPressPlugin extends Plugin {
 
     this.addCommand({
       id: "preview-current-note",
-      name: "WeChat: Preview Current Note",
+      name: "Preview Current Note",
       hotkeys: [{ modifiers: ["Mod", "Shift"], key: "M" }],
       callback: () => {
         void this.activatePreviewView(true);
@@ -46,7 +45,7 @@ export default class MarkPressPlugin extends Plugin {
 
     this.addCommand({
       id: "open-preview",
-      name: "WeChat: Open Preview",
+      name: "Open Preview",
       callback: () => {
         void this.activatePreviewView(false);
       },
@@ -54,7 +53,7 @@ export default class MarkPressPlugin extends Plugin {
 
     this.addCommand({
       id: "copy-current-note",
-      name: "WeChat: Copy Current Note",
+      name: "Copy for Current Platform",
       hotkeys: [{ modifiers: ["Mod", "Shift"], key: "C" }],
       callback: () => {
         void this.copyCurrent();
@@ -63,7 +62,7 @@ export default class MarkPressPlugin extends Plugin {
 
     this.addCommand({
       id: "copy-as-rich-text",
-      name: "WeChat: Copy as Rich Text",
+      name: "Copy (WeChat rich text / X Markdown)",
       callback: () => {
         void this.copyCurrent();
       },
@@ -102,6 +101,12 @@ export default class MarkPressPlugin extends Plugin {
     }
     if (this.settings.colorMode !== "dark") {
       this.settings.colorMode = "light";
+    }
+    if (this.settings.platform !== "x") {
+      this.settings.platform = "wechat";
+    }
+    if (typeof this.settings.xImageBaseUrl !== "string") {
+      this.settings.xImageBaseUrl = "";
     }
   }
 
@@ -176,8 +181,19 @@ export default class MarkPressPlugin extends Plugin {
 
   private async copyCurrent(): Promise<void> {
     try {
-      await copyActiveNote(this.app, this.settings);
-      new Notice("Copied for WeChat");
+      const result = await copyActiveNote(this.app, this.settings);
+      if (result.platform === "x") {
+        const n = result.unresolvedLocalCount || 0;
+        if (n > 0) {
+          new Notice(
+            `Copied Markdown for X — ${n} local image(s) need a public URL (set X Image Base URL, or upload in X).`
+          );
+        } else {
+          new Notice("Copied Markdown for X");
+        }
+      } else {
+        new Notice("Copied for WeChat");
+      }
     } catch (err) {
       console.error(err);
       new Notice(err instanceof Error ? err.message : "Copy failed");

@@ -18,6 +18,20 @@ export class MarkPressSettingTab extends PluginSettingTab {
     containerEl.createEl("h2", { text: "MarkPress" });
 
     new Setting(containerEl)
+      .setName("Default platform")
+      .setDesc("WeChat = themed HTML copy. X Article = native Markdown copy.")
+      .addDropdown((dropdown) => {
+        dropdown.addOption("wechat", "WeChat");
+        dropdown.addOption("x", "X Article");
+        dropdown.setValue(this.plugin.settings.platform || "wechat");
+        dropdown.onChange(async (value) => {
+          this.plugin.settings.platform = value === "x" ? "x" : "wechat";
+          await this.plugin.saveSettings();
+          this.plugin.refreshOpenPreviews();
+        });
+      });
+
+    new Setting(containerEl)
       .setName("Default theme")
       .setDesc(
         "Publish palette for WeChat output. Colors are fixed hex values — not tied to your Obsidian theme."
@@ -35,6 +49,23 @@ export class MarkPressSettingTab extends PluginSettingTab {
           this.plugin.settings.themeId = value;
           await this.plugin.saveSettings();
           this.plugin.refreshOpenPreviews();
+        });
+      });
+
+    containerEl.createEl("h3", { text: "X Article" });
+
+    new Setting(containerEl)
+      .setName("X image base URL")
+      .setDesc(
+        "Public CDN/prefix for vault images when copying Markdown for X. Example: https://cdn.example.com/vault — then ![[a.png]] becomes that URL + vault path. Leave empty to keep relative paths (X cannot load vault files)."
+      )
+      .addText((text) => {
+        text
+          .setPlaceholder("https://…")
+          .setValue(this.plugin.settings.xImageBaseUrl || "");
+        text.onChange(async (value) => {
+          this.plugin.settings.xImageBaseUrl = value.trim();
+          await this.plugin.saveSettings();
         });
       });
 

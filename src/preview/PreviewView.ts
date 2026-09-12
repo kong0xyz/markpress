@@ -2,17 +2,23 @@ import { ItemView, MarkdownView, TFile, WorkspaceLeaf, Notice, setIcon } from "o
 import type MarkPressPlugin from "../main";
 import {
   buildWeChatHtml,
+  buildXPreview,
   copyActiveNote,
   resolveMarkdownFile,
 } from "../services/pipeline";
 import { listBuiltinThemes } from "../themes";
+import type { PublishPlatform } from "../settings/store";
+import { PUBLISH_PLATFORMS } from "../settings/store";
 
 export const VIEW_TYPE_MARKPRESS_PREVIEW = "markpress-wechat-preview";
 
 export class MarkPressPreviewView extends ItemView {
   plugin: MarkPressPlugin;
+  private platformSelectEl: HTMLSelectElement | null = null;
   private themeSelectEl: HTMLSelectElement | null = null;
   private colorModeEl: HTMLSelectElement | null = null;
+  private wechatControlsEl: HTMLElement | null = null;
+  private copyBtnEl: HTMLButtonElement | null = null;
   private previewFrameEl: HTMLElement | null = null;
   private shadowHostEl: HTMLElement | null = null;
   private statusEl: HTMLElement | null = null;
@@ -30,7 +36,7 @@ export class MarkPressPreviewView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "WeChat Preview";
+    return "MarkPress";
   }
 
   getIcon(): string {
@@ -44,7 +50,24 @@ export class MarkPressPreviewView extends ItemView {
 
     const toolbar = container.createDiv({ cls: "markpress-toolbar" });
 
-    this.themeSelectEl = toolbar.createEl("select", { cls: "markpress-theme-select" });
+    this.platformSelectEl = toolbar.createEl("select", { cls: "markpress-platform-select" });
+    this.platformSelectEl.setAttr("aria-label", "Platform");
+    for (const p of PUBLISH_PLATFORMS) {
+      this.platformSelectEl.createEl("option", { text: p.label, value: p.id });
+    }
+    this.platformSelectEl.value = this.plugin.settings.platform || "wechat";
+    this.platformSelectEl.addEventListener("change", async () => {
+      this.plugin.settings.platform = this.platformSelectEl!.value as PublishPlatform;
+      await this.plugin.saveSettings();
+      this.syncPlatformChrome();
+      await this.renderPreview();
+    });
+
+    this.wechatControlsEl = toolbar.createDiv({ cls: "markpress-wechat-controls" });
+
+    this.themeSelectEl = this.wechatControlsEl.createEl("select", {
+      cls: "markpress-theme-select",
+    });
     this.themeSelectEl.setAttr("aria-label", "Theme");
     this.populateThemes();
     this.themeSelectEl.value = this.plugin.settings.themeId;
@@ -54,7 +77,9 @@ export class MarkPressPreviewView extends ItemView {
       await this.renderPreview();
     });
 
-    this.colorModeEl = toolbar.createEl("select", { cls: "markpress-color-mode" });
+    this.colorModeEl = this.wechatControlsEl.createEl("select", {
+      cls: "markpress-color-mode",
+    });
     this.colorModeEl.setAttr("aria-label", "Color mode");
     this.colorModeEl.createEl("option", { text: "Light", value: "light" });
     this.colorModeEl.createEl("option", { text: "Dark", value: "dark" });
@@ -80,13 +105,25 @@ export class MarkPressPreviewView extends ItemView {
     toolbar.createDiv({ cls: "spacer" });
     this.statusEl = toolbar.createDiv({ cls: "markpress-status" });
 
-    const copyBtn = toolbar.createEl("button", { text: "Copy for WeChat", cls: "mod-cta" });
-    copyBtn.addEventListener("click", async () => {
+    this.copyBtnEl = toolbar.createEl("button", { text: "Copy", cls: "mod-cta" });
+    this.copyBtnEl.addEventListener("click", async () => {
       try {
         const file = resolveMarkdownFile(this.app, this.sourceFile);
-        await copyActiveNote(this.app, this.plugin.settings, file);
-        new Notice("Copied for WeChat");
-        this.setStatus("Copied");
+        const result = await copyActiveNote(this.app, this.plugin.settings, file);
+        if (result.platform === "x") {
+          const n = result.unresolvedLocalCount || 0;
+          if (n > 0) {
+            new Notice(
+              `Copied Markdown for X — ${n} local image(s) need a public URL (set X Image Base URL in settings, or upload in X).`
+            );
+          } else {
+            new Notice("Copied Markdown for X");
+          }
+          this.setStatus(n > 0 ? `Copied · ${n} local img` : "Copied");
+        } else {
+          new Notice("Copied for WeChat");
+          this.setStatus("Copied");
+        }
       } catch (err) {
         console.error(err);
         new Notice("Copy failed");
@@ -101,6 +138,7 @@ export class MarkPressPreviewView extends ItemView {
       text: "Open a Markdown note to preview.",
     });
 
+    this.syncPlatformChrome();
     this.registerWorkspaceEvents();
     await this.renderPreview();
   }
@@ -117,6 +155,10 @@ export class MarkPressPreviewView extends ItemView {
     if (this.colorModeEl) {
       this.colorModeEl.value = this.plugin.settings.colorMode || "light";
     }
+    if (this.platformSelectEl) {
+      this.platformSelectEl.value = this.plugin.settings.platform || "wechat";
+    }
+    this.syncPlatformChrome();
   }
 
   scheduleRender(): void {
@@ -144,40 +186,66 @@ export class MarkPressPreviewView extends ItemView {
     }
 
     this.sourceFile = file;
+    const platform = this.plugin.settings.platform === "x" ? "x" : "wechat";
 
     try {
       this.currentResolver?.revoke();
-      // Same builder as Copy — only image mode differs (blob).
-      const { html, resolver, colorScheme } = await buildWeChatHtml(
-        this.app,
-        file,
-        this.plugin.settings,
-        "preview"
-      );
-      this.currentResolver = resolver;
       this.previewFrameEl.empty();
-      this.previewFrameEl.toggleClass("is-dark", colorScheme === "dark");
-      this.previewFrameEl.toggleClass("is-light", colorScheme === "light");
 
-      this.previewFrameEl.createDiv({
-        cls: "markpress-preview-meta",
-        text: file.basename,
-      });
+      if (platform === "x") {
+        const { html, resolver } = await buildXPreview(this.app, file, this.plugin.settings);
+        this.currentResolver = resolver;
+        this.previewFrameEl.toggleClass("is-dark", false);
+        this.previewFrameEl.toggleClass("is-light", true);
+        this.previewFrameEl.toggleClass("is-x", true);
 
-      // Shadow DOM: MarkPress HTML is isolated from Obsidian theme CSS.
-      this.shadowHostEl = this.previewFrameEl.createDiv({ cls: "markpress-shadow-host" });
-      const shadow = this.shadowHostEl.attachShadow({ mode: "open" });
-      shadow.innerHTML = `<style>
-        :host { display: block; }
-        /* Reset inheritance from Obsidian without !important on content */
-        :host, .root {
-          all: initial;
-          display: block;
-          font-family: sans-serif;
-        }
-        .root { color: inherit; }
-        img { max-width: 100%; }
-      </style><div class="root">${html}</div>`;
+        this.previewFrameEl.createDiv({
+          cls: "markpress-preview-meta",
+          text: `${file.basename} · X Article`,
+        });
+
+        this.shadowHostEl = this.previewFrameEl.createDiv({ cls: "markpress-shadow-host" });
+        const shadow = this.shadowHostEl.attachShadow({ mode: "open" });
+        shadow.innerHTML = `<style>
+          :host { display: block; }
+          :host, .root {
+            all: initial;
+            display: block;
+            font-family: sans-serif;
+          }
+          .root { color: inherit; }
+          img { max-width: 100%; }
+        </style><div class="root">${html}</div>`;
+      } else {
+        const { html, resolver, colorScheme } = await buildWeChatHtml(
+          this.app,
+          file,
+          this.plugin.settings,
+          "preview"
+        );
+        this.currentResolver = resolver;
+        this.previewFrameEl.toggleClass("is-dark", colorScheme === "dark");
+        this.previewFrameEl.toggleClass("is-light", colorScheme === "light");
+        this.previewFrameEl.toggleClass("is-x", false);
+
+        this.previewFrameEl.createDiv({
+          cls: "markpress-preview-meta",
+          text: `${file.basename} · WeChat`,
+        });
+
+        this.shadowHostEl = this.previewFrameEl.createDiv({ cls: "markpress-shadow-host" });
+        const shadow = this.shadowHostEl.attachShadow({ mode: "open" });
+        shadow.innerHTML = `<style>
+          :host { display: block; }
+          :host, .root {
+            all: initial;
+            display: block;
+            font-family: sans-serif;
+          }
+          .root { color: inherit; }
+          img { max-width: 100%; }
+        </style><div class="root">${html}</div>`;
+      }
 
       this.setStatus("");
     } catch (err) {
@@ -189,6 +257,14 @@ export class MarkPressPreviewView extends ItemView {
         text: "Failed to render preview.",
       });
       this.setStatus("Render error", true);
+    }
+  }
+
+  private syncPlatformChrome(): void {
+    const platform = this.plugin.settings.platform === "x" ? "x" : "wechat";
+    this.wechatControlsEl?.toggleClass("is-hidden", platform === "x");
+    if (this.copyBtnEl) {
+      this.copyBtnEl.setText(platform === "x" ? "Copy Markdown" : "Copy for WeChat");
     }
   }
 
