@@ -1,5 +1,5 @@
-import matter from "gray-matter";
 import MarkdownIt from "markdown-it";
+import type Token from "markdown-it/lib/token.mjs";
 import type {
   Align,
   BlockNode,
@@ -11,16 +11,8 @@ import type {
   TableCellNode,
 } from "../ast/types";
 import { preprocessCallouts, type CalloutPlaceholder } from "./callout";
+import { parseFrontmatter } from "./frontmatter";
 import { preprocessWikiSyntax, type WikiImageRef } from "./images";
-
-interface Token {
-  type: string;
-  tag: string;
-  content: string;
-  info: string;
-  children: Token[] | null;
-  attrGet(name: string): string | null;
-}
 
 const md = new MarkdownIt({
   html: false,
@@ -34,7 +26,7 @@ md.enable("table");
 md.enable("strikethrough");
 
 export function parseMarkdown(source: string): MarkPressDocument {
-  const { content, data } = matter(source || "");
+  const { content, data } = parseFrontmatter(source || "");
   const meta = normalizeMeta(data);
 
   const { markdown, callouts } = preprocessCallouts(content);
@@ -46,7 +38,10 @@ export function parseMarkdown(source: string): MarkPressDocument {
 }
 
 function normalizeMeta(data: Record<string, unknown>): DocumentMeta {
-  const wechatRaw = (data.wechat || {}) as Record<string, unknown>;
+  const wechatRaw =
+    data.wechat && typeof data.wechat === "object"
+      ? (data.wechat as Record<string, unknown>)
+      : {};
   const wechat: DocumentWeChatOverrides = {};
 
   if (typeof wechatRaw.theme === "string") wechat.theme = wechatRaw.theme;
@@ -205,7 +200,8 @@ function parseTable(tokens: Token[], wikiImages: WikiImageRef[]): BlockNode {
       const style = t.attrGet("style") || "";
       const alignMatch = style.match(/text-align:(left|center|right)/);
       if (section === "head") {
-        align.push((alignMatch?.[1] as Align) || null);
+        const a = alignMatch?.[1];
+        align.push(a === "left" || a === "center" || a === "right" ? a : null);
       }
       const inline = tokens[i + 1];
       currentRow.push({

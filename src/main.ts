@@ -27,17 +27,17 @@ export default class MarkPressPlugin extends Plugin {
     const status = this.addStatusBarItem();
     status.addClass("markpress-status-bar");
     status.setAttr("aria-label", "MarkPress Preview");
-    status.setAttr("title", "MarkPress Preview (⌘⇧M)");
+    status.setAttr("title", "MarkPress Preview");
     setIcon(status, "book-open");
     status.createSpan({ text: " MarkPress", cls: "markpress-status-bar-label" });
     status.addEventListener("click", () => {
       void this.activatePreviewView(true);
     });
 
+    // No default hotkeys — users bind in Hotkeys settings (avoids conflicts).
     this.addCommand({
       id: "preview-current-note",
       name: "Preview Current Note",
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "M" }],
       callback: () => {
         void this.activatePreviewView(true);
       },
@@ -54,7 +54,6 @@ export default class MarkPressPlugin extends Plugin {
     this.addCommand({
       id: "copy-current-note",
       name: "Copy for Current Platform",
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "C" }],
       callback: () => {
         void this.copyCurrent();
       },
@@ -69,15 +68,10 @@ export default class MarkPressPlugin extends Plugin {
     });
 
     this.addSettingTab(new MarkPressSettingTab(this.app, this));
-
-    // Keep a tab icon in the right sidebar so preview is one click away.
-    this.app.workspace.onLayoutReady(() => {
-      void this.ensureRightSidebarLeaf();
-    });
   }
 
   onunload(): void {
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_MARKPRESS_PREVIEW);
+    // Do not detach leaves — preserves user sidebar placement across reloads.
   }
 
   async loadSettings(): Promise<void> {
@@ -168,12 +162,7 @@ export default class MarkPressPlugin extends Plugin {
       });
     }
 
-    // Expand right sidebar so the preview is visible.
-    const rightSplit = (workspace as unknown as { rightSplit?: { expand?: () => void } })
-      .rightSplit;
-    rightSplit?.expand?.();
-
-    workspace.revealLeaf(leaf);
+    await workspace.revealLeaf(leaf);
     if (forceRender && leaf.view instanceof MarkPressPreviewView) {
       await leaf.view.renderPreview();
     }

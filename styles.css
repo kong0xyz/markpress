@@ -102,45 +102,10 @@
   word-break: break-all;
 }
 
-.markpress-preview-body {
-  /* Isolate from Obsidian theme styles (bold/quote accents, etc.) */
-  color: #09090b;
-}
-
-.markpress-preview-body strong,
-.markpress-preview-body b,
-.markpress-preview-body em,
-.markpress-preview-body i,
-.markpress-preview-body s,
-.markpress-preview-body del,
-.markpress-preview-body blockquote,
-.markpress-preview-body a,
-.markpress-preview-body code,
-.markpress-preview-body p,
-.markpress-preview-body li,
-.markpress-preview-body h1,
-.markpress-preview-body h2,
-.markpress-preview-body h3,
-.markpress-preview-body h4,
-.markpress-preview-body h5,
-.markpress-preview-body h6,
-.markpress-preview-body td,
-.markpress-preview-body th {
-  /* Prefer MarkPress inline styles; neutralize Obsidian accent paints */
-  background-image: none !important;
-}
-
-.markpress-preview-body mark {
-  background: transparent !important;
-  color: inherit !important;
-}
-
-/* Obsidian themes often paint pre/code with low-contrast tokens — kill that. */
-.markpress-preview-body pre,
-.markpress-preview-body pre code,
-.markpress-preview-body :not(pre) > code {
-  -webkit-text-fill-color: unset !important;
-  text-shadow: none !important;
+.markpress-custom-css {
+  width: 100%;
+  font-family: var(--font-monospace);
+  font-size: 12px;
 }
 
 .markpress-status {

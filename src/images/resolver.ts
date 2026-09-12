@@ -107,7 +107,7 @@ async function optimizeImageBuffer(
 
     const width = Math.max(1, Math.round(bitmap.width * scale));
     const height = Math.max(1, Math.round(bitmap.height * scale));
-    const canvas = document.createElement("canvas");
+    const canvas = createEl("canvas");
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
@@ -122,7 +122,7 @@ async function optimizeImageBuffer(
     const outMime = hasAlpha ? "image/png" : "image/jpeg";
     const quality = hasAlpha ? undefined : options.jpegQuality;
     const outBlob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob((b) => resolve(b), outMime, quality)
+      canvas.toBlob((b: Blob | null) => resolve(b), outMime, quality)
     );
     if (!outBlob) return { buffer, mime };
     const outBuffer = await outBlob.arrayBuffer();

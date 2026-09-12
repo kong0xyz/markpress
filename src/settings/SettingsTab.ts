@@ -15,7 +15,8 @@ export class MarkPressSettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "MarkPress" });
+
+    new Setting(containerEl).setName("MarkPress").setHeading();
 
     new Setting(containerEl)
       .setName("Default platform")
@@ -52,7 +53,7 @@ export class MarkPressSettingTab extends PluginSettingTab {
         });
       });
 
-    containerEl.createEl("h3", { text: "X Article" });
+    new Setting(containerEl).setName("X Article").setHeading();
 
     new Setting(containerEl)
       .setName("X image base URL")
@@ -69,7 +70,7 @@ export class MarkPressSettingTab extends PluginSettingTab {
         });
       });
 
-    containerEl.createEl("h3", { text: "Color mode" });
+    new Setting(containerEl).setName("Color mode").setHeading();
 
     new Setting(containerEl)
       .setName("Article color mode")
@@ -87,7 +88,7 @@ export class MarkPressSettingTab extends PluginSettingTab {
         });
       });
 
-    containerEl.createEl("h3", { text: "Typography" });
+    new Setting(containerEl).setName("Typography").setHeading();
 
     this.addColor("Primary color", "primaryColor");
     this.addColor("Text color", "textColor");
@@ -117,18 +118,18 @@ export class MarkPressSettingTab extends PluginSettingTab {
     this.addNumber("Paragraph spacing", "paragraphMarginBottom", 0, 40, 1);
     this.addNumber("Max width", "maxWidth", 400, 900, 10);
 
-    containerEl.createEl("h3", { text: "Headings" });
+    new Setting(containerEl).setName("Headings").setHeading();
     this.addHeadingVariant("H1 style", "h1Variant");
     this.addHeadingVariant("H2 style", "h2Variant");
     this.addHeadingVariant("H3 style", "h3Variant");
 
-    containerEl.createEl("h3", { text: "Blocks" });
+    new Setting(containerEl).setName("Blocks").setHeading();
     this.addColor("Quote background", "quoteBackground");
     this.addColor("Code background", "codeBackground");
     this.addColor("Link color", "linkColor");
     this.addNumber("Image border radius", "imageBorderRadius", 0, 24, 1);
 
-    containerEl.createEl("h3", { text: "Images" });
+    new Setting(containerEl).setName("Images").setHeading();
     new Setting(containerEl)
       .setName("Optimize images before copying")
       .setDesc("Resize large local images and re-encode before Base64 embedding.")
@@ -166,7 +167,7 @@ export class MarkPressSettingTab extends PluginSettingTab {
         });
       });
 
-    containerEl.createEl("h3", { text: "Advanced" });
+    new Setting(containerEl).setName("Advanced").setHeading();
     new Setting(containerEl)
       .setName("Custom CSS")
       .setDesc(
@@ -176,8 +177,7 @@ export class MarkPressSettingTab extends PluginSettingTab {
         area.setPlaceholder("h2 { color: #222; border-left: 4px solid #625fff; }");
         area.setValue(this.plugin.settings.customCss);
         area.inputEl.rows = 8;
-        area.inputEl.style.width = "100%";
-        area.inputEl.style.fontFamily = "var(--font-monospace)";
+        area.inputEl.addClass("markpress-custom-css");
         area.onChange(async (value) => {
           this.plugin.settings.customCss = value;
           await this.plugin.saveSettings();
@@ -197,17 +197,18 @@ export class MarkPressSettingTab extends PluginSettingTab {
         btn.onClick(async () => {
           const input = containerEl.querySelector(
             'input[data-role="save-theme-name"]'
-          ) as HTMLInputElement | null;
-          const name = input?.value.trim();
+          );
+          if (!(input instanceof HTMLInputElement)) return;
+          const name = input.value.trim();
           if (!name) return;
           await this.plugin.saveCurrentAsTheme(name);
-          input!.value = "";
+          input.value = "";
           this.display();
         });
       });
 
     if (this.plugin.settings.savedThemes.length) {
-      containerEl.createEl("h3", { text: "Saved themes" });
+      new Setting(containerEl).setName("Saved themes").setHeading();
       for (const saved of this.plugin.settings.savedThemes) {
         new Setting(containerEl)
           .setName(saved.name)
@@ -225,7 +226,7 @@ export class MarkPressSettingTab extends PluginSettingTab {
           })
           .addButton((btn) => {
             btn.setButtonText("Delete");
-            btn.setWarning();
+            btn.setDestructive();
             btn.onClick(async () => {
               this.plugin.settings.savedThemes = this.plugin.settings.savedThemes.filter(
                 (t) => t.id !== saved.id
@@ -241,7 +242,7 @@ export class MarkPressSettingTab extends PluginSettingTab {
       .setName("Reset style overrides")
       .addButton((btn) => {
         btn.setButtonText("Reset");
-        btn.setWarning();
+        btn.setDestructive();
         btn.onClick(async () => {
           this.plugin.settings.overrides = {};
           this.plugin.settings.customCss = "";

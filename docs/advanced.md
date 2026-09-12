@@ -57,5 +57,3 @@ Copy `main.js`, `manifest.json`, and `styles.css` into:
 ```text
 <Vault>/.obsidian/plugins/markpress/
 ```
-
-Community release steps: [PUBLISHING.md](../PUBLISHING.md).

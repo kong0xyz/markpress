@@ -1,6 +1,5 @@
 import type {
   BlockNode,
-  CalloutKind,
   CalloutNode,
   HeadingNode,
   ImageNode,
@@ -130,7 +129,7 @@ function renderHeading(node: HeadingNode, options: RenderOptions): string {
 
 async function renderCallout(node: CalloutNode, options: RenderOptions): Promise<string> {
   const theme = options.theme;
-  const kind = (node.kind || "note").toLowerCase() as CalloutKind;
+  const kind = (node.kind || "note").toLowerCase();
   const accent = CALLOUT_ACCENTS[kind] || {
     color: theme.colors.primary,
     label: String(node.kind || "NOTE").toUpperCase(),

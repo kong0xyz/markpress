@@ -71,7 +71,7 @@ export type CalloutKind =
   | "warning"
   | "important"
   | "info"
-  | string;
+  | (string & {});
 
 export interface CalloutNode {
   type: "callout";

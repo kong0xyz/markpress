@@ -1,8 +1,8 @@
 {
   "id": "markpress",
   "name": "MarkPress",
-  "version": "0.1.0",
-  "minAppVersion": "1.5.0",
+  "version": "0.1.1",
+  "minAppVersion": "1.7.2",
   "description": "Format Markdown notes for WeChat public accounts and X Articles with live preview, themes, and one-click copy.",
   "author": "Kong",
   "authorUrl": "https://github.com/kong0xyz",

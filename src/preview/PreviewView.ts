@@ -1,4 +1,12 @@
-import { ItemView, MarkdownView, TFile, WorkspaceLeaf, Notice, setIcon } from "obsidian";
+import {
+  ItemView,
+  MarkdownView,
+  TFile,
+  WorkspaceLeaf,
+  Notice,
+  setIcon,
+} from "obsidian";
+import type { App } from "obsidian";
 import type MarkPressPlugin from "../main";
 import {
   buildWeChatHtml,
@@ -11,6 +19,17 @@ import type { PublishPlatform } from "../settings/store";
 import { PUBLISH_PLATFORMS } from "../settings/store";
 
 export const VIEW_TYPE_MARKPRESS_PREVIEW = "markpress-wechat-preview";
+
+const PREVIEW_SHADOW_CSS = `
+:host { display: block; }
+:host, .root {
+  all: initial;
+  display: block;
+  font-family: sans-serif;
+}
+.root { color: inherit; }
+img { max-width: 100%; }
+`;
 
 export class MarkPressPreviewView extends ItemView {
   plugin: MarkPressPlugin;
@@ -56,11 +75,13 @@ export class MarkPressPreviewView extends ItemView {
       this.platformSelectEl.createEl("option", { text: p.label, value: p.id });
     }
     this.platformSelectEl.value = this.plugin.settings.platform || "wechat";
-    this.platformSelectEl.addEventListener("change", async () => {
-      this.plugin.settings.platform = this.platformSelectEl!.value as PublishPlatform;
-      await this.plugin.saveSettings();
-      this.syncPlatformChrome();
-      await this.renderPreview();
+    this.platformSelectEl.addEventListener("change", () => {
+      void (async () => {
+        this.plugin.settings.platform = this.platformSelectEl!.value as PublishPlatform;
+        await this.plugin.saveSettings();
+        this.syncPlatformChrome();
+        await this.renderPreview();
+      })();
     });
 
     this.wechatControlsEl = toolbar.createDiv({ cls: "markpress-wechat-controls" });
@@ -71,10 +92,12 @@ export class MarkPressPreviewView extends ItemView {
     this.themeSelectEl.setAttr("aria-label", "Theme");
     this.populateThemes();
     this.themeSelectEl.value = this.plugin.settings.themeId;
-    this.themeSelectEl.addEventListener("change", async () => {
-      this.plugin.settings.themeId = this.themeSelectEl!.value;
-      await this.plugin.saveSettings();
-      await this.renderPreview();
+    this.themeSelectEl.addEventListener("change", () => {
+      void (async () => {
+        this.plugin.settings.themeId = this.themeSelectEl!.value;
+        await this.plugin.saveSettings();
+        await this.renderPreview();
+      })();
     });
 
     this.colorModeEl = this.wechatControlsEl.createEl("select", {
@@ -84,10 +107,12 @@ export class MarkPressPreviewView extends ItemView {
     this.colorModeEl.createEl("option", { text: "Light", value: "light" });
     this.colorModeEl.createEl("option", { text: "Dark", value: "dark" });
     this.colorModeEl.value = this.plugin.settings.colorMode || "light";
-    this.colorModeEl.addEventListener("change", async () => {
-      this.plugin.settings.colorMode = this.colorModeEl!.value as "light" | "dark";
-      await this.plugin.saveSettings();
-      await this.renderPreview();
+    this.colorModeEl.addEventListener("change", () => {
+      void (async () => {
+        this.plugin.settings.colorMode = this.colorModeEl!.value as "light" | "dark";
+        await this.plugin.saveSettings();
+        await this.renderPreview();
+      })();
     });
 
     const customizeBtn = toolbar.createEl("button", {
@@ -96,39 +121,42 @@ export class MarkPressPreviewView extends ItemView {
     });
     setIcon(customizeBtn, "settings");
     customizeBtn.addEventListener("click", () => {
-      // @ts-expect-error Obsidian internal API
-      this.app.setting.open();
-      // @ts-expect-error Obsidian internal API
-      this.app.setting.openTabById("markpress");
+      const appWithSetting = this.app as App & {
+        setting?: { open: () => void; openTabById: (id: string) => void };
+      };
+      appWithSetting.setting?.open();
+      appWithSetting.setting?.openTabById("markpress");
     });
 
     toolbar.createDiv({ cls: "spacer" });
     this.statusEl = toolbar.createDiv({ cls: "markpress-status" });
 
     this.copyBtnEl = toolbar.createEl("button", { text: "Copy", cls: "mod-cta" });
-    this.copyBtnEl.addEventListener("click", async () => {
-      try {
-        const file = resolveMarkdownFile(this.app, this.sourceFile);
-        const result = await copyActiveNote(this.app, this.plugin.settings, file);
-        if (result.platform === "x") {
-          const n = result.unresolvedLocalCount || 0;
-          if (n > 0) {
-            new Notice(
-              `Copied Markdown for X — ${n} local image(s) need a public URL (set X Image Base URL in settings, or upload in X).`
-            );
+    this.copyBtnEl.addEventListener("click", () => {
+      void (async () => {
+        try {
+          const file = resolveMarkdownFile(this.app, this.sourceFile);
+          const result = await copyActiveNote(this.app, this.plugin.settings, file);
+          if (result.platform === "x") {
+            const n = result.unresolvedLocalCount || 0;
+            if (n > 0) {
+              new Notice(
+                `Copied Markdown for X — ${n} local image(s) need a public URL (set X Image Base URL in settings, or upload in X).`
+              );
+            } else {
+              new Notice("Copied Markdown for X");
+            }
+            this.setStatus(n > 0 ? `Copied · ${n} local img` : "Copied");
           } else {
-            new Notice("Copied Markdown for X");
+            new Notice("Copied for WeChat");
+            this.setStatus("Copied");
           }
-          this.setStatus(n > 0 ? `Copied · ${n} local img` : "Copied");
-        } else {
-          new Notice("Copied for WeChat");
-          this.setStatus("Copied");
+        } catch (err) {
+          console.error(err);
+          new Notice("Copy failed");
+          this.setStatus("Copy failed", true);
         }
-      } catch (err) {
-        console.error(err);
-        new Notice("Copy failed");
-        this.setStatus("Copy failed", true);
-      }
+      })();
     });
 
     const scroll = container.createDiv({ cls: "markpress-preview-scroll" });
@@ -205,17 +233,7 @@ export class MarkPressPreviewView extends ItemView {
         });
 
         this.shadowHostEl = this.previewFrameEl.createDiv({ cls: "markpress-shadow-host" });
-        const shadow = this.shadowHostEl.attachShadow({ mode: "open" });
-        shadow.innerHTML = `<style>
-          :host { display: block; }
-          :host, .root {
-            all: initial;
-            display: block;
-            font-family: sans-serif;
-          }
-          .root { color: inherit; }
-          img { max-width: 100%; }
-        </style><div class="root">${html}</div>`;
+        this.mountShadowPreview(this.shadowHostEl, html);
       } else {
         const { html, resolver, colorScheme } = await buildWeChatHtml(
           this.app,
@@ -234,17 +252,7 @@ export class MarkPressPreviewView extends ItemView {
         });
 
         this.shadowHostEl = this.previewFrameEl.createDiv({ cls: "markpress-shadow-host" });
-        const shadow = this.shadowHostEl.attachShadow({ mode: "open" });
-        shadow.innerHTML = `<style>
-          :host { display: block; }
-          :host, .root {
-            all: initial;
-            display: block;
-            font-family: sans-serif;
-          }
-          .root { color: inherit; }
-          img { max-width: 100%; }
-        </style><div class="root">${html}</div>`;
+        this.mountShadowPreview(this.shadowHostEl, html);
       }
 
       this.setStatus("");
@@ -258,6 +266,31 @@ export class MarkPressPreviewView extends ItemView {
       });
       this.setStatus("Render error", true);
     }
+  }
+
+  /** Mount themed HTML into Shadow DOM without assigning innerHTML. */
+  private mountShadowPreview(host: HTMLElement, html: string): void {
+    const shadow = host.attachShadow({ mode: "open" });
+
+    // Use createElement (not createEl) so nodes stay off-document until appended.
+    const style = document.createElement("style");
+    style.textContent = PREVIEW_SHADOW_CSS;
+    shadow.appendChild(style);
+
+    const root = document.createElement("div");
+    root.className = "root";
+    const parsed = new DOMParser().parseFromString(
+      `<div id="markpress-shadow-root">${html}</div>`,
+      "text/html"
+    );
+    const source = parsed.getElementById("markpress-shadow-root");
+    if (source) {
+      // importNode clones and does NOT detach — must iterate a snapshot, not while(firstChild).
+      for (const child of Array.from(source.childNodes)) {
+        root.appendChild(document.importNode(child, true));
+      }
+    }
+    shadow.appendChild(root);
   }
 
   private syncPlatformChrome(): void {

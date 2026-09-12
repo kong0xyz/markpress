@@ -23,14 +23,11 @@
 
 1. 安装并启用 **MarkPress**（设置 → 第三方插件 → 浏览 → 搜索 MarkPress）。
 2. 打开一篇 Markdown 笔记。
-3. 点击左侧或底部的 MarkPress 图标，或按 `Cmd/Ctrl+Shift+M`。
+3. 点击左侧或底部的 MarkPress 图标，或在命令面板运行 **MarkPress: Preview Current Note**。
 
 右侧会出现预览。顶部选择 **WeChat** 或 **X Article**，再点复制。
 
-| 快捷键 | 作用 |
-| --- | --- |
-| `Cmd/Ctrl+Shift+M` | 打开 / 刷新预览 |
-| `Cmd/Ctrl+Shift+C` | 按当前选择的平台复制 |
+可选：在 **设置 → 快捷键** 里搜索 “MarkPress” 自行绑定。插件不预设快捷键，避免和其他插件冲突。
 
 ## 发到微信公众号
 
@@ -61,14 +58,9 @@
 
 MarkPress 在本地运行，不会把笔记发到服务器。只有你点击「复制」时，才会写入系统剪贴板。
 
-给审核用的完整说明：[docs/disclosures.md](./docs/disclosures.md) · [SECURITY.md](./SECURITY.md)
+## Contribute
 
-## 更多
-
-- [进阶选项](./docs/advanced.md) — 单篇主题覆盖、X 图床前缀、开发构建
-- [更新日志](./CHANGELOG.md) — 版本历史
-- [插件上架说明](./PUBLISHING.md) — 维护者提交社区插件时用
-- [截图规范](./images/README.md) — README 配图命名与尺寸
+想反馈问题、改进插件，或参与发版？请看 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
 ## 许可
 

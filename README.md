@@ -23,14 +23,11 @@ Everything runs on your computer. No account. No upload service required.
 
 1. Install and enable **MarkPress** (Community plugins → Browse → MarkPress).
 2. Open a Markdown note.
-3. Click the MarkPress icon (left ribbon or status bar), or press `Cmd/Ctrl+Shift+M`.
+3. Click the MarkPress icon (left ribbon or status bar), or run **MarkPress: Preview Current Note** from the command palette.
 
 You will see a live preview. Choose **WeChat** or **X Article** at the top, then copy.
 
-| Shortcut | Action |
-| --- | --- |
-| `Cmd/Ctrl+Shift+M` | Open / refresh preview |
-| `Cmd/Ctrl+Shift+C` | Copy for the platform you selected |
+Optional: bind your own shortcuts under **Settings → Hotkeys** (search “MarkPress”). No defaults are set, so nothing conflicts with other plugins.
 
 ## Publish to WeChat
 
@@ -61,14 +58,9 @@ Images in your note are included automatically when you copy.
 
 MarkPress works offline. It does not send your notes to any server. Copy only uses your clipboard when you click Copy.
 
-Full policy details for reviewers: [docs/disclosures.md](./docs/disclosures.md) · [SECURITY.md](./SECURITY.md)
+## Contribute
 
-## More help
-
-- [Advanced options](./docs/advanced.md) — per-note theme overrides, X image host, developer build
-- [Changelog](./CHANGELOG.md) — version history
-- [Publishing this plugin](./PUBLISHING.md) — for maintainers submitting to Obsidian Community Plugins
-- [Screenshot guidelines](./images/README.md) — naming and size for README images
+Want to report a bug, improve the plugin, or help with releases? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 

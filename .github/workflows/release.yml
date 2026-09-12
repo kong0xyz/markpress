@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@v4
 
@@ -36,8 +38,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
+          notes=$(awk '/^## \[/{if(found) exit; found=1; next} found' CHANGELOG.md)
+          if [ -z "$notes" ]; then
+            notes="MarkPress ${tag}"
+          fi
+          # Published (not draft) so Obsidian Community Plugins can resolve the version.
           gh release create "$tag" \
-            --title="$tag" \
-            --generate-notes \
-            --draft \
+            --title="MarkPress ${tag}" \
+            --notes="$notes" \
             main.js manifest.json styles.css
+
+      - name: Attest release artifacts
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            main.js
+            styles.css
+            manifest.json
