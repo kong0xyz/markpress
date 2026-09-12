@@ -1,63 +1,100 @@
 # MarkPress
 
-Obsidian 插件：将当前 Markdown 笔记转换为适合微信公众号后台粘贴的富文本（Inline CSS）。
+Format Markdown notes for **WeChat public accounts** and **X Articles**: live preview, theme engine, and one-click copy.
 
-## 核心流程
+[中文文档](./README.zh.md)
 
-```text
-Obsidian 编辑 Markdown
-  → WeChat Preview（实时预览）
-  → 选择 / 调整主题
-  → Copy for WeChat
-  → 公众号后台 Cmd/Ctrl + V
-```
+## Features
 
-## 功能（MVP）
+- **WeChat**: theme rendering → inline-CSS rich text → copy `text/html` + `text/plain` (paste into the WeChat editor)
+- **X Article**: structure preview → copy native Markdown (paste into the X Articles editor)
+- Built-in themes (shadcn palettes + extras), Light/Dark for WeChat
+- Obsidian Callouts, tables, code blocks, wiki images `![[...]]`
+- WeChat copy embeds local images as Base64 (optional compression)
+- X Markdown keeps remote `https://` image URLs; optional **X image base URL** for vault images on a CDN
 
-- Markdown → AST → WeChat Renderer → Inline CSS HTML
-- 内置主题：Default / Minimal / Elegant / Tech / Chinese
-- Settings 可视化样式 + Advanced Custom CSS（计算进 inline style）
-- Frontmatter `wechat:` 覆盖
-- Callout / 表格 / 代码块 / Wiki 图片
-- 预览：本地图片 Blob URL
-- 复制：本地图片 Base64（可压缩）
-- 剪贴板：`text/html` + `text/plain`
+## Disclosures
 
-## 开发
+Required by [Obsidian Developer policies](https://docs.obsidian.md/Developer+policies):
 
-```bash
-npm install
-npm run build
-```
+| Topic | Status |
+| --- | --- |
+| Payment / account required | **No** |
+| Network use | **No** outbound network calls by default. The plugin does not call remote APIs. Optional setting **X image base URL** only rewrites Markdown image paths to a URL you configure; it does not upload files. |
+| Telemetry | **None** (no client-side or server-side telemetry) |
+| Ads | **None** |
+| Files outside the vault | **No**. Reads only notes and images inside the current vault via the Obsidian API. |
+| Clipboard | **Yes**. Copy writes to the system clipboard (rich HTML for WeChat, plain Markdown for X). |
+| Closed source | **No**. Full source is in this repository (MIT). |
 
-将本目录（或 `main.js` + `manifest.json` + `styles.css`）链接到：
+## Install (after community listing)
+
+1. Open **Settings → Community plugins → Browse**
+2. Search for **MarkPress**
+3. Install and enable
+
+### Manual / beta install
+
+1. Build: `npm install && npm run build`
+2. Copy `main.js`, `manifest.json`, and `styles.css` into:
 
 ```text
 <Vault>/.obsidian/plugins/markpress/
 ```
 
-然后在 Obsidian 中启用 **MarkPress**。
+3. Enable **MarkPress** under Community plugins
 
-## 命令
+## Usage
 
-| Command | 说明 |
-|---|---|
-| WeChat: Preview Current Note | 打开预览并渲染当前笔记 |
-| WeChat: Open Preview | 打开预览面板 |
-| WeChat: Copy Current Note | 不打开预览直接复制 |
-| WeChat: Copy as Rich Text | 同上 |
+1. Open a Markdown note
+2. Open MarkPress preview (ribbon, status bar, or command **Preview Current Note** / `Mod+Shift+M`)
+3. Choose platform in the toolbar: **WeChat** or **X Article**
+4. **WeChat**: pick theme + Light/Dark → **Copy for WeChat** → paste into the WeChat public-account editor
+5. **X Article**: **Copy Markdown** → paste into the X Articles editor
 
-## Frontmatter 示例
+Hotkey **Copy for Current Platform**: `Mod+Shift+C`
+
+### WeChat frontmatter overrides
 
 ```yaml
 ---
-title: Markdown 写作指南
+title: Example
 wechat:
-  theme: minimal
-  primaryColor: "#625fff"
+  theme: shadcn-zinc
+  primaryColor: "#2563eb"
   fontSize: 16
-  lineHeight: 1.8
+  lineHeight: 1.75
 ---
 ```
 
-优先级：Document Frontmatter → Theme overrides → Global Settings → Builtin Default
+Priority: document `wechat:` → settings overrides → builtin theme.
+
+### X images (Obsidian → X)
+
+X Articles **do not** accept Base64 / `data:` images. Local vault images must become public URLs or be uploaded inside X.
+
+- Remote `https://...` links are kept as-is in copied Markdown
+- Local / wiki images become vault-relative paths unless you set **X image base URL** in settings (CDN prefix), e.g. `https://cdn.example.com/vault` → `https://cdn.example.com/vault/attachments/a.png`
+
+## Commands
+
+| Command | Description |
+| --- | --- |
+| Preview Current Note | Open preview and render the active note |
+| Open Preview | Open the preview leaf |
+| Copy for Current Platform | Copy WeChat rich text or X Markdown |
+| Copy (WeChat rich text / X Markdown) | Same as above |
+
+## Development
+
+```bash
+npm install
+npm run build   # production main.js
+npm run dev     # watch build
+```
+
+See [PUBLISHING.md](./PUBLISHING.md) for Obsidian Community Plugin release steps.
+
+## License
+
+[MIT](./LICENSE) · Author: [Kong](https://github.com/kong0xyz)

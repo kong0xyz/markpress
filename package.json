@@ -1,7 +1,7 @@
 {
   "name": "markpress",
   "version": "0.1.0",
-  "description": "Obsidian plugin for WeChat public account Markdown formatting",
+  "description": "Format Markdown notes for WeChat public accounts and X Articles with live preview, themes, and one-click copy.",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
@@ -10,10 +10,12 @@
   },
   "keywords": [
     "obsidian",
+    "obsidian-plugin",
     "wechat",
-    "markdown"
+    "markdown",
+    "x-articles"
   ],
-  "author": "MarkPress",
+  "author": "Kong",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.11.0",
