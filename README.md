@@ -1,99 +1,74 @@
 # MarkPress
 
-Format Markdown notes for **WeChat public accounts** and **X Articles**: live preview, theme engine, and one-click copy.
+Write in Obsidian. Preview how it will look. Copy once — paste into **WeChat** or **X Articles**.
 
-[中文文档](./README.zh.md)
+[中文说明](./README.zh.md)
 
-## Features
+## What it does
 
-- **WeChat**: theme rendering → inline-CSS rich text → copy `text/html` + `text/plain` (paste into the WeChat editor)
-- **X Article**: structure preview → copy native Markdown (paste into the X Articles editor)
-- Built-in themes (shadcn palettes + extras), Light/Dark for WeChat
-- Obsidian Callouts, tables, code blocks, wiki images `![[...]]`
-- WeChat copy embeds local images as Base64 (optional compression)
-- X Markdown keeps remote `https://` image URLs; optional **X image base URL** for vault images on a CDN
+MarkPress turns your Markdown note into publish-ready content:
 
-## Disclosures
-
-Required by [Obsidian Developer policies](https://docs.obsidian.md/Developer+policies):
-
-| Topic | Status |
+| Platform | What you get |
 | --- | --- |
-| Payment / account required | **No** |
-| Network use | **No** outbound network calls by default. The plugin does not call remote APIs. Optional setting **X image base URL** only rewrites Markdown image paths to a URL you configure; it does not upload files. |
-| Telemetry | **None** (no client-side or server-side telemetry) |
-| Ads | **None** |
-| Files outside the vault | **No**. Reads only notes and images inside the current vault via the Obsidian API. |
-| Clipboard | **Yes**. Copy writes to the system clipboard (rich HTML for WeChat, plain Markdown for X). |
-| Closed source | **No**. Full source is in this repository (MIT). |
+| **WeChat** | Styled article you can paste into the WeChat public-account editor |
+| **X Article** | Clean Markdown you can paste into the X Articles editor |
 
-## Install (after community listing)
+Everything runs on your computer. No account. No upload service required.
 
-1. Open **Settings → Community plugins → Browse**
-2. Search for **MarkPress**
-3. Install and enable
+![WeChat preview](./images/preview-wechat.png)
 
-### Manual / beta install
+![X Article preview](./images/preview-x.png)
 
-1. Build: `npm install && npm run build`
-2. Copy `main.js`, `manifest.json`, and `styles.css` into:
+## Quick start
 
-```text
-<Vault>/.obsidian/plugins/markpress/
-```
+1. Install and enable **MarkPress** (Community plugins → Browse → MarkPress).
+2. Open a Markdown note.
+3. Click the MarkPress icon (left ribbon or status bar), or press `Cmd/Ctrl+Shift+M`.
 
-3. Enable **MarkPress** under Community plugins
+You will see a live preview. Choose **WeChat** or **X Article** at the top, then copy.
 
-## Usage
-
-1. Open a Markdown note
-2. Open MarkPress preview (ribbon, status bar, or command **Preview Current Note** / `Mod+Shift+M`)
-3. Choose platform in the toolbar: **WeChat** or **X Article**
-4. **WeChat**: pick theme + Light/Dark → **Copy for WeChat** → paste into the WeChat public-account editor
-5. **X Article**: **Copy Markdown** → paste into the X Articles editor
-
-Hotkey **Copy for Current Platform**: `Mod+Shift+C`
-
-### WeChat frontmatter overrides
-
-```yaml
----
-title: Example
-wechat:
-  theme: shadcn-zinc
-  primaryColor: "#2563eb"
-  fontSize: 16
-  lineHeight: 1.75
----
-```
-
-Priority: document `wechat:` → settings overrides → builtin theme.
-
-### X images (Obsidian → X)
-
-X Articles **do not** accept Base64 / `data:` images. Local vault images must become public URLs or be uploaded inside X.
-
-- Remote `https://...` links are kept as-is in copied Markdown
-- Local / wiki images become vault-relative paths unless you set **X image base URL** in settings (CDN prefix), e.g. `https://cdn.example.com/vault` → `https://cdn.example.com/vault/attachments/a.png`
-
-## Commands
-
-| Command | Description |
+| Shortcut | Action |
 | --- | --- |
-| Preview Current Note | Open preview and render the active note |
-| Open Preview | Open the preview leaf |
-| Copy for Current Platform | Copy WeChat rich text or X Markdown |
-| Copy (WeChat rich text / X Markdown) | Same as above |
+| `Cmd/Ctrl+Shift+M` | Open / refresh preview |
+| `Cmd/Ctrl+Shift+C` | Copy for the platform you selected |
 
-## Development
+## Publish to WeChat
 
-```bash
-npm install
-npm run build   # production main.js
-npm run dev     # watch build
-```
+1. Select **WeChat** in the preview toolbar.
+2. Pick a theme and Light / Dark if you like.
+3. Click **Copy for WeChat**.
+4. Open the WeChat public-account editor and paste (`Cmd/Ctrl+V`).
 
-See [PUBLISHING.md](./PUBLISHING.md) for Obsidian Community Plugin release steps.
+Images in your note are included automatically when you copy.
+
+**Tip:** Light mode usually looks closer to what readers see on WeChat.
+
+## Publish to X Articles
+
+1. Select **X Article** in the preview toolbar.
+2. Click **Copy Markdown**.
+3. Paste into the X Articles editor.
+
+**About images on X:** X does not accept embedded image files from Obsidian the same way WeChat does. Online image links (`https://...`) work as-is. For pictures stored only in your vault, upload them inside X after pasting, or set an image host URL in MarkPress settings if you already publish images to the web.
+
+## Good to know
+
+- Works with headings, bold, lists, quotes, tables, code blocks, and Obsidian callouts.
+- Wiki images like `![[photo.png]]` are supported.
+- You can change the default platform and themes under **Settings → MarkPress**.
+
+## Privacy
+
+MarkPress works offline. It does not send your notes to any server. Copy only uses your clipboard when you click Copy.
+
+Full policy details for reviewers: [docs/disclosures.md](./docs/disclosures.md) · [SECURITY.md](./SECURITY.md)
+
+## More help
+
+- [Advanced options](./docs/advanced.md) — per-note theme overrides, X image host, developer build
+- [Changelog](./CHANGELOG.md) — version history
+- [Publishing this plugin](./PUBLISHING.md) — for maintainers submitting to Obsidian Community Plugins
+- [Screenshot guidelines](./images/README.md) — naming and size for README images
 
 ## License
 

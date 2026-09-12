@@ -1,102 +1,74 @@
 # MarkPress
 
-把 Obsidian 里的 Markdown 笔记，排成适合发布的格式：
+在 Obsidian 里写好文章，预览效果，一键复制——粘贴到 **微信公众号** 或 **X Articles**。
 
-- **微信公众号**：主题渲染 + 带格式复制（Inline CSS）
-- **X Article**：结构预览 + 复制原生 Markdown
+[English](./README.md)
 
-[English README](./README.md)
+## 它能做什么
 
-## 功能
+把你的 Markdown 笔记变成可直接发布的内容：
 
-- **微信**：主题渲染 → 内联 CSS 富文本 → 复制 `text/html` + `text/plain`（粘贴到公众号后台）
-- **X Article**：结构预览 → 复制原生 Markdown（粘贴到 X Articles 编辑器）
-- 内置主题（shadcn 色板等），微信支持 Light / Dark
-- 支持 Callout、表格、代码块、Wiki 图片 `![[...]]`
-- 微信复制：本地图片嵌入 Base64（可选压缩）
-- X Markdown：保留远程 `https://` 图片；可选配置 **X image base URL**，把库内图片改写成 CDN 地址
-
-## 披露说明（Disclosures）
-
-遵循 [Obsidian Developer policies](https://docs.obsidian.md/Developer+policies)：
-
-| 项目 | 说明 |
+| 平台 | 你会得到 |
 | --- | --- |
-| 付费 / 账号 | **无** |
-| 网络请求 | **默认无**。插件不调用远程 API。设置项 **X image base URL** 仅把 Markdown 图片路径改写成你配置的 URL，不会上传文件。 |
-| 遥测 | **无** |
-| 广告 | **无** |
-| 访问库外文件 | **无**。只通过 Obsidian API 读取当前库内的笔记与图片。 |
-| 剪贴板 | **会使用**。复制时写入系统剪贴板（微信富文本 / X 纯 Markdown）。 |
-| 闭源 | **否**。完整源码在本仓库（MIT）。 |
+| **微信公众号** | 带排版样式的文章，粘贴进公众号后台即可 |
+| **X Article** | 干净的 Markdown，粘贴进 X 长文编辑器即可 |
 
-## 安装（上架社区插件后）
+全程在本地完成，不用注册账号，也不必把笔记上传到任何服务。
 
-1. **设置 → 第三方插件 → 浏览**
-2. 搜索 **MarkPress**
-3. 安装并启用
+![微信预览](./images/preview-wechat.png)
 
-### 手动 / 测试安装
+![X Article 预览](./images/preview-x.png)
 
-1. 构建：`npm install && npm run build`
-2. 将 `main.js`、`manifest.json`、`styles.css` 放到：
+## 快速开始
 
-```text
-<Vault>/.obsidian/plugins/markpress/
-```
+1. 安装并启用 **MarkPress**（设置 → 第三方插件 → 浏览 → 搜索 MarkPress）。
+2. 打开一篇 Markdown 笔记。
+3. 点击左侧或底部的 MarkPress 图标，或按 `Cmd/Ctrl+Shift+M`。
 
-3. 在第三方插件中启用 **MarkPress**
+右侧会出现预览。顶部选择 **WeChat** 或 **X Article**，再点复制。
 
-## 用法
-
-1. 打开一篇 Markdown 笔记
-2. 打开 MarkPress 预览（左侧图标、状态栏，或命令 **Preview Current Note** / `Mod+Shift+M`）
-3. 工具栏选择平台：**WeChat** 或 **X Article**
-4. **微信**：选主题 + Light/Dark → **Copy for WeChat** → 粘贴到公众号后台
-5. **X Article**：**Copy Markdown** → 粘贴到 X Articles 编辑器
-
-快捷键 **按当前平台复制**：`Mod+Shift+C`
-
-### 微信 Frontmatter 覆盖
-
-```yaml
----
-title: 示例
-wechat:
-  theme: shadcn-zinc
-  primaryColor: "#2563eb"
-  fontSize: 16
-  lineHeight: 1.75
----
-```
-
-优先级：文档 `wechat:` → 设置覆盖 → 内置主题。
-
-### X 图片（Obsidian → X）
-
-X Articles **不支持** Base64 / `data:` 图片。本地图需要公网 URL，或在 X 里手动上传。
-
-- 已有 `https://...`：复制 Markdown 时原样保留
-- 本地 / Wiki 图：默认写成库内相对路径；若在设置中配置 **X image base URL**（CDN 前缀），会拼成公网地址，例如 `https://cdn.example.com/vault` → `https://cdn.example.com/vault/attachments/a.png`
-
-## 命令
-
-| 命令 | 说明 |
+| 快捷键 | 作用 |
 | --- | --- |
-| Preview Current Note | 打开预览并渲染当前笔记 |
-| Open Preview | 打开预览面板 |
-| Copy for Current Platform | 按当前平台复制（微信富文本 / X Markdown） |
-| Copy (WeChat rich text / X Markdown) | 同上 |
+| `Cmd/Ctrl+Shift+M` | 打开 / 刷新预览 |
+| `Cmd/Ctrl+Shift+C` | 按当前选择的平台复制 |
 
-## 开发
+## 发到微信公众号
 
-```bash
-npm install
-npm run build   # 生产构建 main.js
-npm run dev     # 监听构建
-```
+1. 预览栏选择 **WeChat**。
+2. 需要的话选一个主题，以及浅色 / 深色。
+3. 点击 **Copy for WeChat**。
+4. 打开微信公众号后台编辑器，粘贴（`Cmd/Ctrl+V`）。
 
-上架社区插件的步骤见 [PUBLISHING.md](./PUBLISHING.md)。
+笔记里的图片一般会一起复制进去。
+
+**提示：** 发布到微信时，浅色模式通常更接近读者最终看到的效果。
+
+## 发到 X Articles
+
+1. 预览栏选择 **X Article**。
+2. 点击 **Copy Markdown**。
+3. 粘贴到 X 的 Articles 编辑器。
+
+**关于图片：** X 不能像微信那样直接带走库里的本地图片。网上的图片链接（`https://...`）可以保留；只存在 Obsidian 库里的图，粘贴后请在 X 里重新上传，或如果你本来就有图床，可在 MarkPress 设置里填写图片地址前缀。
+
+## 其他说明
+
+- 支持标题、加粗、列表、引用、表格、代码块、Obsidian Callout。
+- 支持 `![[图片.png]]` 这种 Wiki 图片写法。
+- 默认平台、主题等可在 **设置 → MarkPress** 里改。
+
+## 隐私
+
+MarkPress 在本地运行，不会把笔记发到服务器。只有你点击「复制」时，才会写入系统剪贴板。
+
+给审核用的完整说明：[docs/disclosures.md](./docs/disclosures.md) · [SECURITY.md](./SECURITY.md)
+
+## 更多
+
+- [进阶选项](./docs/advanced.md) — 单篇主题覆盖、X 图床前缀、开发构建
+- [更新日志](./CHANGELOG.md) — 版本历史
+- [插件上架说明](./PUBLISHING.md) — 维护者提交社区插件时用
+- [截图规范](./images/README.md) — README 配图命名与尺寸
 
 ## 许可
 

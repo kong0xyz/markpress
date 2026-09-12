@@ -12,7 +12,8 @@ Checklist aligned with the official docs:
 1. **Public GitHub repository** (required by the Community directory).  
    This project may also live on GitLab for private work, but the submission `repo` field must be `owner/name` on **github.com**.
 2. Root files present:
-   - `README.md` (purpose, usage, **disclosures**)
+   - `README.md` (user-facing purpose and usage; keep it simple)
+   - `docs/disclosures.md` (policy disclosures for reviewers)
    - `LICENSE` (MIT)
    - `manifest.json`
    - `versions.json`
@@ -56,6 +57,11 @@ Attach as **binary release assets**:
 - `manifest.json`
 - `styles.css`
 
+Also:
+
+- Write short release notes (what users gain in this version). You can mirror bullets from `CHANGELOG.md`.
+- Keep a repo `CHANGELOG.md` for history; do not dump full version history into `README.md`.
+
 ### Automated (recommended)
 
 1. Push this repo to GitHub
@@ -97,7 +103,7 @@ git push hub 0.1.0
 
 Reviewers typically check:
 
-- README disclosures (network, payments, telemetry, clipboard, vault access)
+- README is clear; disclosures live in `docs/disclosures.md` / `SECURITY.md`
 - No obfuscated code; source available
 - No client-side telemetry / ads / self-update
 - SemVer + matching release tag + assets
