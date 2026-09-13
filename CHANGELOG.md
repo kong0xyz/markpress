@@ -6,6 +6,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follo
 
 Obsidian users mainly see updates via **GitHub Releases**; this file is the readable history in the repo. Do **not** put a long changelog in the README.
 
+## [0.1.2] — 2026-09-13
+
+### Fixed
+
+- Drop dynamic `<style>` in preview Shadow DOM (CSS only via `styles.css` / inline styles)
+- Settings: no plugin-name heading; remove `setDestructive` (requires Obsidian 1.13+)
+- Frontmatter parser typing / nested-indent regex clarity
+
 ## [0.1.1] — 2026-09-13
 
 ### Fixed
@@ -24,5 +32,6 @@ Obsidian users mainly see updates via **GitHub Releases**; this file is the read
 - Support for callouts, tables, code blocks, and wiki images `![[...]]`
 - Optional X image base URL for rewriting local image paths in Markdown
 
+[0.1.2]: https://github.com/kong0xyz/markpress/releases/tag/0.1.2
 [0.1.1]: https://github.com/kong0xyz/markpress/releases/tag/0.1.1
 [0.1.0]: https://github.com/kong0xyz/markpress/releases/tag/0.1.0

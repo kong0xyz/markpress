@@ -26,10 +26,13 @@ function parseSimpleYaml(raw: string): Record<string, unknown> {
   let currentMap: Record<string, unknown> | null = null;
   let currentKey = "";
 
-  for (const line of raw.split(/\r?\n/)) {
-    if (!line.trim() || line.trimStart().startsWith("#")) continue;
+  const lines: string[] = raw.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
 
-    const nested = /^(  |\t)([\w-]+)\s*:\s*(.*)$/.exec(line);
+    // Nested under a map key: two spaces or one tab.
+    const nested = /^(?: {2}|\t)([\w-]+)\s*:\s*(.*)$/.exec(line);
     if (nested && currentMap) {
       currentMap[nested[2]] = coerceScalar(nested[3]);
       continue;

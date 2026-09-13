@@ -248,10 +248,16 @@ async function renderInlines(
 }
 
 function prefixLines(text: string, prefix: string): string {
-  return text
-    .split("\n")
-    .map((line) => (line.length ? `${prefix}${line}` : prefix.trimEnd()))
-    .join("\n");
+  const lines = text.split("\n");
+  const out: string[] = [];
+  for (const line of lines) {
+    if (line.length > 0) {
+      out.push(prefix + line);
+    } else {
+      out.push(prefix.replace(/\s+$/u, ""));
+    }
+  }
+  return out.join("\n");
 }
 
 function wrapInlineCode(value: string): string {

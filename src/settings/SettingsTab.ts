@@ -16,8 +16,6 @@ export class MarkPressSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    new Setting(containerEl).setName("MarkPress").setHeading();
-
     new Setting(containerEl)
       .setName("Default platform")
       .setDesc("WeChat = themed HTML copy. X Article = native Markdown copy.")
@@ -226,7 +224,6 @@ export class MarkPressSettingTab extends PluginSettingTab {
           })
           .addButton((btn) => {
             btn.setButtonText("Delete");
-            btn.setDestructive();
             btn.onClick(async () => {
               this.plugin.settings.savedThemes = this.plugin.settings.savedThemes.filter(
                 (t) => t.id !== saved.id
@@ -242,7 +239,6 @@ export class MarkPressSettingTab extends PluginSettingTab {
       .setName("Reset style overrides")
       .addButton((btn) => {
         btn.setButtonText("Reset");
-        btn.setDestructive();
         btn.onClick(async () => {
           this.plugin.settings.overrides = {};
           this.plugin.settings.customCss = "";

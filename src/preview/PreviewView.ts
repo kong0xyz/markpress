@@ -20,17 +20,6 @@ import { PUBLISH_PLATFORMS } from "../settings/store";
 
 export const VIEW_TYPE_MARKPRESS_PREVIEW = "markpress-wechat-preview";
 
-const PREVIEW_SHADOW_CSS = `
-:host { display: block; }
-:host, .root {
-  all: initial;
-  display: block;
-  font-family: sans-serif;
-}
-.root { color: inherit; }
-img { max-width: 100%; }
-`;
-
 export class MarkPressPreviewView extends ItemView {
   plugin: MarkPressPlugin;
   private platformSelectEl: HTMLSelectElement | null = null;
@@ -268,24 +257,22 @@ export class MarkPressPreviewView extends ItemView {
     }
   }
 
-  /** Mount themed HTML into Shadow DOM without assigning innerHTML. */
+  /**
+   * Mount themed HTML into Shadow DOM (isolates Obsidian theme CSS).
+   * No <style> tags — plugin CSS must live in styles.css; preview HTML uses inline styles.
+   */
   private mountShadowPreview(host: HTMLElement, html: string): void {
     const shadow = host.attachShadow({ mode: "open" });
+    const root = createEl("div", { cls: "markpress-shadow-root" });
+    root.detach();
 
-    // Use createElement (not createEl) so nodes stay off-document until appended.
-    const style = document.createElement("style");
-    style.textContent = PREVIEW_SHADOW_CSS;
-    shadow.appendChild(style);
-
-    const root = document.createElement("div");
-    root.className = "root";
     const parsed = new DOMParser().parseFromString(
       `<div id="markpress-shadow-root">${html}</div>`,
       "text/html"
     );
     const source = parsed.getElementById("markpress-shadow-root");
     if (source) {
-      // importNode clones and does NOT detach — must iterate a snapshot, not while(firstChild).
+      // importNode clones and does NOT detach — iterate a snapshot, not while(firstChild).
       for (const child of Array.from(source.childNodes)) {
         root.appendChild(document.importNode(child, true));
       }
